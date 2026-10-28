@@ -1,0 +1,87 @@
+/* =========================================================
+   ArtScope — 設計系統（Design Tokens）
+   所有顏色、字體、間距、動態都集中在此檔案調整。
+   ========================================================= */
+
+:root {
+  /* ---------- 色彩 ---------- */
+  --c-bg: #0d0d0f;            /* 頁面背景 */
+  --c-bg-soft: #131316;       /* 區塊背景 */
+  --c-surface: #191a1e;       /* 卡片／面板 */
+  --c-surface-2: #202126;     /* 較亮的面板 */
+  --c-line: #2c2d33;          /* 分隔線 */
+  --c-line-strong: #3d3e46;
+
+  --c-text: #f3f0e9;          /* 主要文字 */
+  --c-text-muted: #a8a49b;    /* 次要文字 */
+  --c-text-dim: #96928b;      /* 輔助文字（需維持 AA 對比） */
+
+  --c-accent: #d97757;        /* 主強調色（陶土橘） */
+  --c-accent-hover: #e88b6d;
+  --c-accent-contrast: #17110e;
+  --c-accent-soft: rgba(217, 119, 87, 0.14);
+
+  --c-success: #8fbf88;
+  --c-warn: #e0b465;
+  --c-danger: #e08a7a;
+  --c-focus: #f2c86f;         /* 鍵盤焦點框 */
+
+  /* ---------- 字體 ---------- */
+  --font-display: Georgia, "Times New Roman", "Noto Serif TC", "Songti TC", serif;
+  --font-body: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", "PingFang TC", sans-serif;
+
+  --fs-xs: 0.75rem;
+  --fs-sm: 0.875rem;
+  --fs-base: 1rem;
+  --fs-md: 1.125rem;
+  --fs-lg: clamp(1.25rem, 1.1rem + 0.7vw, 1.6rem);
+  --fs-xl: clamp(1.6rem, 1.3rem + 1.4vw, 2.4rem);
+  --fs-2xl: clamp(2.2rem, 1.6rem + 3vw, 4rem);
+  --fs-3xl: clamp(2.8rem, 1.8rem + 4.6vw, 5.5rem);
+
+  --lh-tight: 1.2;
+  --lh-snug: 1.4;
+  --lh-body: 1.75;
+
+  --tracking-wide: 0.14em;
+
+  /* ---------- 間距 ---------- */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --sp-7: 3rem;
+  --sp-8: 4rem;
+  --sp-9: 6rem;
+
+  /* ---------- 尺寸 ---------- */
+  --container: 1240px;
+  --container-narrow: 780px;
+  --header-h: 66px;
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+
+  /* ---------- 動態 ---------- */
+  --dur-fast: 140ms;
+  --dur: 260ms;
+  --dur-slow: 560ms;
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ---------- 層級 ---------- */
+  --z-header: 100;
+  --z-menu: 90;
+  --z-toast: 300;
+  --z-lightbox: 400;
+}
+
+/* 使用者偏好減少動態效果時，全面停用過渡 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur: 0ms;
+    --dur-slow: 0ms;
+  }
+}

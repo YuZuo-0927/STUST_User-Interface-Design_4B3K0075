@@ -1,0 +1,14 @@
+正式作品圖片放置處
+==================
+
+請依每件作品建立一個資料夾，例如：
+
+  work-001/
+  ├─ cover.webp          作品封面
+  ├─ gallery/            補充圖片（細節圖、其他角度…）
+  └─ process/            製作過程圖片
+
+放好圖片後，到專案根目錄的 assets/js/data.js 新增一筆作品資料，
+把 coverImage / gallery / process 的路徑指向這些檔案即可。
+
+詳細步驟請見專案根目錄的 README.md。
