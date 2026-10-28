@@ -27,6 +27,8 @@ html {
 
 body {
   margin: 0;
+  /* 頁首為固定定位，需補回首頁高度，避免內容被蓋住 */
+  padding-top: var(--header-h);
   background: var(--c-bg);
   color: var(--c-text);
   font-family: var(--font-body);
@@ -94,6 +96,11 @@ ul {
 
 .skip-link:focus {
   top: var(--sp-3);
+}
+
+/* 頁首固定後，錨點跳轉（跳至主要內容）要預留頁首高度 */
+[id="main"] {
+  scroll-margin-top: calc(var(--header-h) + var(--sp-4));
 }
 
 .visually-hidden {
@@ -179,12 +186,22 @@ main {
 
 /* ---------- 頁首導覽 ---------- */
 .site-header {
-  position: sticky;
+  /* 固定在視窗頂端：若用 sticky，外層 #site-header 容器與頁首同高，
+     sticky 無法超出父層範圍，頁首會直接被捲出畫面（收合功能就失效） */
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: var(--z-header);
   background: rgba(13, 13, 15, 0.94);
   border-bottom: 1px solid var(--c-line);
   backdrop-filter: blur(6px);
+  transition: transform var(--dur) var(--ease);
+}
+
+/* 導覽列收合：往下滑時藏起、往上滑時出現（頁面頂端一律顯示） */
+.site-header.is-hidden {
+  transform: translateY(-100%);
 }
 
 .site-header__inner {
@@ -468,6 +485,13 @@ main {
 .badge--demo {
   border-color: var(--c-warn);
   color: var(--c-warn);
+}
+
+/* 系列作品的圖片序號徽章（例如 2 / 4） */
+.badge--series {
+  color: var(--c-text);
+  border-color: var(--c-line-strong);
+  font-variant-numeric: tabular-nums;
 }
 
 .badge--accent {

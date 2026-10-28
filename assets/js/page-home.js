@@ -65,7 +65,7 @@
       return;
     }
 
-    host.innerHTML = AS.ui.gridHTML(featured);
+    host.innerHTML = AS.ui.gridHTML(featured, "", { expandSeries: true });
     AS.ui.bindImageError(host);
     AS.ui.setupReveal();
   }

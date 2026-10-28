@@ -20,6 +20,29 @@
     return (params.get("slug") || "").trim();
   }
 
+  // 從網址取得要顯示的圖片編號（artwork.html?slug=…&img=2）
+  function getInitialImageIndex() {
+    var params = new URLSearchParams(window.location.search);
+    var raw = params.get("img");
+    var n = raw === null ? 1 : parseInt(raw, 10);
+    if (isNaN(n) || n < 1) n = 1;
+    return n - 1;
+  }
+
+  // 切換圖片時同步網址，分享網址就會停在目前這張圖
+  function syncUrlImage() {
+    if (!current) return;
+    try {
+      var params = new URLSearchParams(window.location.search);
+      params.set("slug", current.slug);
+      if (images.length > 1) params.set("img", String(imageIndex + 1));
+      else params.delete("img");
+      history.replaceState(null, "", window.location.pathname + "?" + params.toString());
+    } catch (e) {
+      /* 某些環境不允許更換網址，忽略即可 */
+    }
+  }
+
   /* ---------- 未找到狀態 ---------- */
 
   function renderNotFound(slug) {
@@ -99,6 +122,24 @@
     if (!images.length) return;
     imageIndex = (index + images.length) % images.length;
     renderViewer();
+    updateHero();
+    syncUrlImage();
+  }
+
+  // 主視覺與檢視器同步（從系列卡片進入時會直接停在指定圖片）
+  function updateHero() {
+    var item = images[imageIndex];
+    if (!item) return;
+    var hero = document.getElementById("hero-image");
+    if (hero) {
+      hero.src = item.src;
+      hero.alt = item.alt || "";
+    }
+    var caption = document.querySelector("[data-hero-caption]");
+    if (caption) {
+      caption.textContent = item.caption || "";
+      caption.hidden = !item.caption;
+    }
   }
 
   /* ---------- 創作故事 ---------- */
@@ -289,7 +330,8 @@
   function render(work) {
     var main = document.getElementById("main");
     images = work.images.slice();
-    imageIndex = 0;
+    // 從網址參數決定起始圖片（例如從系列卡片 ?img=2 進入）
+    imageIndex = Math.min(Math.max(getInitialImageIndex(), 0), images.length - 1);
 
     var typeLabel = data.categoryLabel(work.type);
     var favOn = AS.favorites.has(work.id);
@@ -310,12 +352,14 @@
       '<div class="detail-hero">' +
       "<div>" +
       '<div class="detail-hero__media">' +
-      AS.ui.imageFrame(images[0].src, images[0].alt, "", 'id="hero-image"') +
+      AS.ui.imageFrame(images[imageIndex].src, images[imageIndex].alt, "", 'id="hero-image"') +
       '<button type="button" class="icon-btn detail-hero__zoom" data-hero-zoom aria-label="放大檢視作品主視覺">⊕ 放大</button>' +
       "</div>" +
-      (images[0].caption
-        ? '<p class="detail-hero__caption">' + esc(images[0].caption) + "</p>"
-        : "") +
+      '<p class="detail-hero__caption" data-hero-caption' +
+      (images[imageIndex].caption ? "" : " hidden") +
+      ">" +
+      esc(images[imageIndex].caption || "") +
+      "</p>" +
       /* B. 圖片檢視器 */
       '<div class="image-viewer" id="image-viewer"></div>' +
       "</div>" +
@@ -387,9 +431,9 @@
       var work = current;
       if (!work) return;
 
-      // 放大主視覺
+      // 放大主視覺（與目前選取的圖片同步）
       if (e.target.closest("[data-hero-zoom]")) {
-        AS.ui.openLightbox(images, 0, e.target.closest("button"));
+        AS.ui.openLightbox(images, imageIndex, e.target.closest("button"));
         return;
       }
 

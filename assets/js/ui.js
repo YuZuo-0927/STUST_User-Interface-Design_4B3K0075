@@ -158,13 +158,27 @@
     opts = opts || {};
     var typeLabel = data.categoryLabel(work.type);
     var tagsText = work.tags.length ? " · " + work.tags.join(" · ") : "";
+    var total = work.images.length;
+    var index = typeof opts.imageIndex === "number" ? opts.imageIndex : 0;
+    if (index < 0 || index >= total) index = 0;
+    var image = work.images[index] || { src: work.coverImage, alt: work.title + " 封面" };
+    var isSeries = total > 1;
+    var href =
+      "artwork.html?slug=" +
+      encodeURIComponent(work.slug) +
+      (isSeries ? "&img=" + (index + 1) : "");
+    var alt = isSeries
+      ? work.title + " 第 " + (index + 1) + " 張圖片（共 " + total + " 張）"
+      : image.alt;
+
     return (
       '<article class="card" data-reveal>' +
-      '<a class="card__link" href="artwork.html?slug=' +
-      encodeURIComponent(work.slug) +
+      '<a class="card__link" href="' +
+      href +
       '">' +
       '<span class="card__media">' +
-      imageFrame(work.coverImage, work.title + " 封面", "card__frame") +
+      imageFrame(image.src, alt, "card__frame") +
+      (isSeries ? '<span class="badge badge--series">' + (index + 1) + " / " + total + "</span>" : "") +
       demoBadge(work) +
       "</span>" +
       '<span class="card__body">' +
@@ -174,6 +188,7 @@
       '<span class="card__meta">' +
       esc(typeLabel) +
       esc(tagsText) +
+      (isSeries ? '<span class="card__count">系列圖片 ' + (index + 1) + " / " + total + "</span>" : "") +
       "</span>" +
       (work.description ? '<span class="card__desc">' + esc(work.description) + "</span>" : "") +
       "</span>" +
@@ -183,19 +198,91 @@
     );
   }
 
-  function gridHTML(list, modifier) {
+  /* 系列展開：多張圖片的作品在列表中拆成多張卡片，
+     每張卡片都連到同一件作品的詳情頁，並直接開在對應的圖片上。 */
+  function expandSeries(list) {
+    var out = [];
+    list.forEach(function (work) {
+      if (work.images.length > 1) {
+        work.images.forEach(function (img, i) {
+          out.push({ work: work, imageIndex: i });
+        });
+      } else {
+        out.push({ work: work, imageIndex: 0 });
+      }
+    });
+    return out;
+  }
+
+  function gridHTML(list, modifier, opts) {
+    opts = opts || {};
     if (!list.length) return "";
+    var cards = opts.expandSeries ? expandSeries(list) : list.map(function (w) {
+      return { work: w, imageIndex: 0 };
+    });
     return (
       '<div class="grid ' +
       (modifier || "") +
       '">' +
-      list
-        .map(function (w) {
-          return cardHTML(w);
+      cards
+        .map(function (item) {
+          return cardHTML(item.work, { imageIndex: item.imageIndex });
         })
         .join("") +
       "</div>"
     );
+  }
+
+  /* ---------------- 區塊收合（往下滑隱藏、往上滑出現） ----------------
+     頁首與作品探索的篩選列都使用這個行為。
+     options：
+       keepVisible() 回傳 true 時強制保持顯示（例如手機選單展開）
+       topLimit      距離頁面頂端多少 px 內一律顯示（預設 8）
+       className     收合時加上的 class 名稱（預設 is-hidden） */
+  function autoHideOnScroll(element, options) {
+    if (!element) return null;
+    var opts = options || {};
+    var className = opts.className || "is-hidden";
+    var topLimit = typeof opts.topLimit === "number" ? opts.topLimit : 8;
+    var SCROLL_GAP = 10; // 小於此位移視為抖動，不切換狀態
+    var lastY = window.scrollY || 0;
+
+    function setHidden(next) {
+      element.classList.toggle(className, next);
+      // 可選：同步在 body 加上 class，供其他區塊調整版面（例如頁首藏起時篩選列貼到最上緣）
+      if (opts.bodyClass) document.body.classList.toggle(opts.bodyClass, next);
+    }
+
+    function onScroll() {
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      var delta = y - lastY;
+      if (Math.abs(delta) < SCROLL_GAP) return;
+      lastY = y;
+      // 頁面頂端、或指定情況下一律保持顯示
+      if (y <= topLimit || (opts.keepVisible && opts.keepVisible())) {
+        setHidden(false);
+        return;
+      }
+      setHidden(delta > 0);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // 鍵盤操作：焦點移入該區塊時保持可見，避免鍵盤使用者找不到目前位置
+    element.addEventListener("focusin", function () {
+      lastY = window.scrollY || 0;
+      setHidden(false);
+    });
+
+    return {
+      show: function () {
+        lastY = window.scrollY || 0;
+        setHidden(false);
+      },
+      hide: function () {
+        setHidden(true);
+      }
+    };
   }
 
   /* ---------------- 頁首 ---------------- */
@@ -270,8 +357,14 @@
       document.body.classList.toggle("menu-open", open);
     }
 
-    toggle.addEventListener("click", function () {
-      setMenu(toggle.getAttribute("aria-expanded") !== "true");
+    /* ---------- 導覽列收合：往下滑隱藏、往上滑出現 ---------- */
+    var headerBar = host.querySelector(".site-header");
+    var headerCollapse = autoHideOnScroll(headerBar, {
+      // 手機選單展開時必須保持可見，否則面板會跟著被藏起來
+      keepVisible: function () {
+        return toggle.getAttribute("aria-expanded") === "true";
+      },
+      bodyClass: "is-header-hidden"
     });
 
     nav.addEventListener("click", function (e) {
@@ -287,6 +380,12 @@
 
     window.addEventListener("resize", function () {
       if (window.innerWidth > 860 && toggle.getAttribute("aria-expanded") === "true") setMenu(false);
+    });
+
+    toggle.addEventListener("click", function () {
+      var open = toggle.getAttribute("aria-expanded") !== "true";
+      setMenu(open);
+      if (open && headerCollapse) headerCollapse.show();
     });
   }
 
@@ -603,7 +702,8 @@
     openLightbox: openLightbox,
     closeLightbox: closeLightbox,
     copyText: copyText,
-    setupReveal: setupReveal
+    setupReveal: setupReveal,
+    autoHideOnScroll: autoHideOnScroll
   };
 
   if (document.readyState === "loading") {

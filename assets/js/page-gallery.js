@@ -173,15 +173,24 @@
     var countHost = document.getElementById("results-count");
     var list = data.filter(state);
     var total = data.all().length;
+    var expanded = countCards(list); // 系列展開後的卡片數量
 
     renderActiveFilters();
     renderLayoutToggle();
 
     if (!hasFilter()) {
-      countHost.innerHTML = "共 <strong>" + total + "</strong> 件作品";
+      countHost.innerHTML =
+        "共 <strong>" + total + "</strong> 件作品" +
+        (expanded !== total ? "（系列圖片展開後為 " + expanded + " 張卡片）" : "");
     } else {
       countHost.innerHTML =
-        "符合條件 <strong>" + list.length + "</strong> 件（全部 " + total + " 件）";
+        "符合條件 <strong>" +
+        list.length +
+        "</strong> 件（全部 " +
+        total +
+        " 件" +
+        (expanded !== list.length ? "，展開為 " + expanded + " 張卡片" : "") +
+        "）";
     }
 
     if (!list.length) {
@@ -206,9 +215,18 @@
       return;
     }
 
-    host.innerHTML = AS.ui.gridHTML(list, state.layout === "editorial" ? "grid--editorial" : "");
+    host.innerHTML = AS.ui.gridHTML(list, state.layout === "editorial" ? "grid--editorial" : "", {
+      expandSeries: true
+    });
     AS.ui.bindImageError(host);
     AS.ui.setupReveal();
+  }
+
+  /* 系列展開後的卡片數量：多張圖片的作品會拆成多張卡片 */
+  function countCards(list) {
+    return list.reduce(function (sum, work) {
+      return sum + (work.images.length > 1 ? work.images.length : 1);
+    }, 0);
   }
 
   function render() {
@@ -306,6 +324,9 @@
     bindEvents();
     render();
     AS.ui.bindImageError(document);
+
+    // 篩選工具列：往下滑收起、往上滑出現（頁首也是同一套行為）
+    AS.ui.autoHideOnScroll(document.querySelector(".toolbar"));
   }
 
   if (document.readyState === "loading") {

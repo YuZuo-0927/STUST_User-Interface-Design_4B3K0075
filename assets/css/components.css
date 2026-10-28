@@ -88,6 +88,16 @@
   margin-bottom: var(--sp-2);
 }
 
+/* 系列作品：在列表中拆成多張卡片時，標示它是同一作品的第幾張圖 */
+.card__count {
+  display: block;
+  margin-top: 3px;
+  font-size: var(--fs-xs);
+  letter-spacing: 0.06em;
+  color: var(--c-text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
 .card__desc {
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -386,6 +396,12 @@
   background: rgba(13, 13, 15, 0.96);
   border-bottom: 1px solid var(--c-line);
   padding-block: var(--sp-4);
+  transition: transform var(--dur) var(--ease);
+}
+
+/* 往下滑收起、往上滑出現（往上推離視窗，包含頁首的高度） */
+.toolbar.is-hidden {
+  transform: translateY(calc(-100% - var(--header-h)));
 }
 
 .toolbar__row {
