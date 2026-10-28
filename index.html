@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ArtScope｜昱佐 YuZuo 的 3D 與 2D 美術作品集</title>
+  <meta name="description" content="昱佐 YuZuo 的 3D 美術與 2D 插畫作品集，可自由瀏覽作品、放大檢視細節並閱讀創作過程。">
+  <link rel="icon" href="artworks/我的LOGO.png" type="image/png">
+  <link rel="stylesheet" href="assets/css/tokens.css">
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <script>document.documentElement.classList.add("js");</script>
+</head>
+<body data-page="home">
+  <a class="skip-link" href="#main">跳至主要內容</a>
+
+  <div id="site-header"></div>
+
+  <main id="main" tabindex="-1">
+    <!-- A. 展覽主視覺 -->
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero__media" aria-hidden="true">
+        <span class="img-frame">
+          <img class="img-frame__img" src="assets/placeholders/hero.svg" alt="" loading="eager">
+        </span>
+      </div>
+      <div class="hero__veil" aria-hidden="true"></div>
+
+      <div class="container hero__inner">
+        <p class="hero__kicker">數位美術作品集 · Digital Art Portfolio</p>
+        <h1 class="hero__title" id="hero-title">ArtScope</h1>
+        <p class="hero__subtitle">昱佐 YuZuo｜3D 美術 × 2D 插畫作品集。</p>
+        <p class="hero__text" id="hero-intro">
+          在這裡你可以依照自己的節奏欣賞作品：放大全圖檢視細節、切換不同張圖片，
+          並查看每件作品的系列與製作圖。喜歡的作品可以收藏，隨時回到收藏清單繼續瀏覽。
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--primary btn--lg" href="gallery.html">開始瀏覽作品</a>
+          <a class="btn btn--ghost btn--lg" href="gallery.html?featured=1">看精選作品</a>
+        </div>
+        <div class="hero__meta">
+          <p><strong data-hero-count>—</strong>展出作品</p>
+          <p><strong data-hero-categories>—</strong>作品分類</p>
+          <p><strong data-hero-featured>—</strong>精選作品</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- B. 精選作品 -->
+    <section class="section" aria-labelledby="featured-title">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-head__eyebrow">Featured</span>
+            <h2 class="section-head__title" id="featured-title">精選作品</h2>
+          </div>
+          <a class="btn btn--ghost" href="gallery.html">查看全部作品</a>
+        </div>
+        <div id="featured-grid"></div>
+      </div>
+    </section>
+
+    <!-- C. 展覽分類入口 -->
+    <section class="section section--tight" aria-labelledby="category-title">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <span class="section-head__eyebrow">Categories</span>
+            <h2 class="section-head__title" id="category-title">依分類探索</h2>
+          </div>
+          <p class="section-head__note">分類可於資料檔中自由增減</p>
+        </div>
+        <div class="category-list" id="category-list"></div>
+      </div>
+    </section>
+
+    <!-- D. 展覽介紹預留 -->
+    <section class="section section--tight" aria-labelledby="about-title">
+      <div class="container">
+        <div class="about-preview">
+          <div>
+            <span class="section-head__eyebrow">About</span>
+            <h2 class="about-preview__title" id="about-title">展覽介紹</h2>
+          </div>
+          <div class="about-preview__body" id="about-preview-body"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <div id="toast-region" class="toast-region" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="assets/js/data.js"></script>
+  <script src="assets/js/artworks.js"></script>
+  <script src="assets/js/store.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/page-home.js"></script>
+</body>
+</html>
